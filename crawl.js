@@ -1,5 +1,6 @@
 const url = require('url');
 const { JSDOM } = require('jsdom');
+const { link } = require('fs');
 
 const normalizeURL = (urlString) => {
 
@@ -13,15 +14,31 @@ const normalizeURL = (urlString) => {
     
 };
 
-const getURLsFromHTML = (htmlString, rootURL) => {
+const getURLsFromHTML = (htmlBody, baseURL) => {
     urls = []
-    dom = new JSDOM(htmlString);
-    // Doesn't seem to be getting the anchor tags
-    const anchorTags = dom.window.document.querySelectorAll('a');
-    // anchorTags.array.forEach(element => {
-    //     urls.append(element.href)
-    // });
-    console.log(anchorTags);
+    dom = new JSDOM(htmlBody);
+    const linkElements = dom.window.document.querySelectorAll('a');
+    linkElements.forEach(element => {
+        if (element.href.slice(0, 1) === '/') {
+            //relative
+            try {
+                const urlObj = new URL(`${baseURL}${element.href}`)
+                urls.push(baseURL + element.href)
+            } catch (err) {
+                console.log(err.message);
+            }
+            
+        } else {
+            // absolute
+            try {
+                const urlObj = new URL(element.href)
+                urls.push(element.href)
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+    });
+    return urls;
 
 }
 
