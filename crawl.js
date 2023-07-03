@@ -2,6 +2,35 @@ const url = require('url');
 const { JSDOM } = require('jsdom');
 const { link } = require('fs');
 
+
+
+const crawlPage = async (currentURL) => {
+
+    console.log(`actively crawling: ${currentURL}`);
+
+    try {
+        const resp = await fetch(currentURL);
+        // we are expecting the response body to be formatted as HTML string, not as JSON
+        
+        if (resp.status > 399) {
+            console.log(`error in fetch with status code: ${resp.status} on page: ${currentURL}`);
+            return
+        }
+
+        const contentType = resp.headers.get("content-type");
+        if (!contentType.includes("text/html")) {
+            console.log(`non html response, content type: ${contentType}, on page ${currentURL}`);
+            return
+        }
+
+        console.log(await resp.text());
+    } catch (error) {
+        console.log(`error in fetch: ${error.message} on page ${currentURL}`);
+    }
+    
+    
+}
+
 const normalizeURL = (urlString) => {
 
     const urlObj = new URL(urlString);
@@ -45,5 +74,6 @@ const getURLsFromHTML = (htmlBody, baseURL) => {
 
 module.exports = {
     normalizeURL,
-    getURLsFromHTML
+    getURLsFromHTML,
+    crawlPage
 }
