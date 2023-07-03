@@ -1,5 +1,5 @@
 const { normalizeURL, getURLsFromHTML, crawlPage } = require('./crawl.js');
-
+const { printReport } = require('./report.js');
 
 async function main() {
 
@@ -24,9 +24,11 @@ async function main() {
     const pages = await crawlPage(baseURL, baseURL, {});
 
     // make an object iterable
-    for (const page of Object.entries(pages)) {
-        console.log(page);
-    }
+    // for (const page of Object.entries(pages)) {
+    //     console.log(page);
+    // }
+
+    printReport(pages);
 }
 
 
